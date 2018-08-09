@@ -1325,7 +1325,7 @@ void XMFS::init(const std::string &AppDir,
   /* Initialize binary data package if any */
   FILE *fp = fopen(m_BinDataFile.c_str(), "rb");
   if (fp == NULL) {
-    throw Exception("Package " + i_binFile + " not found !");
+    throw Exception("Package " + m_BinDataFile + " not found !");
   }
 
   char cBuf[256];
