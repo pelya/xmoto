@@ -96,7 +96,7 @@ BOOL LibraryOK(STRPTR libname, ULONG version, ULONG revision) {
 }
 #endif
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(__ANDROID__)
 int SDL_main(int nNumArgs, char **ppcArgs) {
 #else
 int main(int nNumArgs, char **ppcArgs) {
@@ -109,6 +109,10 @@ int main(int nNumArgs, char **ppcArgs) {
     printf("I need MiniGL 2.0 Beta or newer. Please upgrade!\n");
     return RETURN_FAIL;
   }
+#endif
+
+#ifdef __ANDROID__
+  setenv("XDG_DATA_DIRS", ".", 1); // Android does not have /usr/share, data files are in the local directory
 #endif
 
   /* Start application */
