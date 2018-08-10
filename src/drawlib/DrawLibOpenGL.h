@@ -24,6 +24,43 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "DrawLib.h"
 #include "include/xm_OpenGL.h"
 
+#if defined(__ANDROID__)
+
+typedef void GL_APIENTRY (*PFNGLGENBUFFERSARBPROC) (GLsizei n, GLuint *buffers);
+typedef void GL_APIENTRY (*PFNGLBINDBUFFERARBPROC) (GLenum target, GLuint buffer);
+typedef void GL_APIENTRY (*PFNGLBUFFERDATAARBPROC) (GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
+typedef void GL_APIENTRY (*PFNGLDELETEBUFFERSARBPROC) (GLsizei n, const GLuint *buffers);
+typedef GLboolean GL_APIENTRY (*PFNGLISRENDERBUFFEREXTPROC) (GLuint renderbuffer);
+typedef void GL_APIENTRY (*PFNGLBINDRENDERBUFFEREXTPROC) (GLenum target, GLuint renderbuffer);
+typedef void GL_APIENTRY (*PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuint *renderbuffers);
+typedef void GL_APIENTRY (*PFNGLGENRENDERBUFFERSEXTPROC) (GLsizei n, GLuint *renderbuffers);
+typedef void GL_APIENTRY (*PFNGLRENDERBUFFERSTORAGEEXTPROC) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+typedef void GL_APIENTRY (*PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC) (GLenum target, GLenum pname, GLint *params);
+typedef GLboolean GL_APIENTRY (*PFNGLISFRAMEBUFFEREXTPROC) (GLuint framebuffer);
+typedef void GL_APIENTRY (*PFNGLBINDFRAMEBUFFEREXTPROC) (GLenum target, GLuint framebuffer);
+typedef void GL_APIENTRY (*PFNGLDELETEFRAMEBUFFERSEXTPROC) (GLsizei n, const GLuint *framebuffers);
+typedef void GL_APIENTRY (*PFNGLGENFRAMEBUFFERSEXTPROC) (GLsizei n, GLuint *framebuffers);
+typedef GLenum GL_APIENTRY (*PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) (GLenum target);
+typedef void GL_APIENTRY (*PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef void GL_APIENTRY (*PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC) (GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+typedef void GL_APIENTRY (*PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC) (GLenum target, GLenum attachment, GLenum pname, GLint *params);
+typedef void GL_APIENTRY (*PFNGLBINDATTRIBLOCATIONARBPROC) (GLhandleARB programObj, GLuint index, const GLcharARB *name);
+typedef void GL_APIENTRY (*PFNGLGETACTIVEATTRIBARBPROC) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei *length, GLint *size, GLenum *type, GLcharARB *name);
+typedef GLint GL_APIENTRY (*PFNGLGETATTRIBLOCATIONARBPROC) (GLhandleARB programObj, const GLcharARB *name);
+typedef void GL_APIENTRY (*PFNGLGENERATEMIPMAPEXTPROC) (GLenum target);
+typedef void GL_APIENTRY (*PFNGLSHADERSOURCEARBPROC) (GLhandleARB shaderObj, GLsizei count, const GLcharARB* *string, const GLint *length);
+typedef void GL_APIENTRY (*PFNGLCOMPILESHADERARBPROC) (GLhandleARB shaderObj);
+typedef GLhandleARB GL_APIENTRY (*PFNGLCREATEPROGRAMOBJECTARBPROC) (void);
+typedef GLhandleARB (*PFNGLCREATESHADEROBJECTARBPROC) (GLenum shaderType);
+typedef void GL_APIENTRY (*PFNGLATTACHOBJECTARBPROC) (GLhandleARB containerObj, GLhandleARB obj);
+typedef void GL_APIENTRY (*PFNGLLINKPROGRAMARBPROC) (GLhandleARB programObj);
+typedef void GL_APIENTRY (*PFNGLUSEPROGRAMOBJECTARBPROC) (GLhandleARB programObj);
+typedef void GL_APIENTRY (*PFNGLVALIDATEPROGRAMARBPROC) (GLhandleARB programObj);
+typedef void GL_APIENTRY (*PFNGLGETOBJECTPARAMETERIVARBPROC) (GLhandleARB obj, GLenum pname, GLint *params);
+typedef void GL_APIENTRY (*PFNGLGETINFOLOGARBPROC) (GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog);
+
+#endif
+
 class DrawLibOpenGL : public DrawLib {
 public:
   DrawLibOpenGL();
@@ -120,9 +157,7 @@ public:
   PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
   PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
   PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
-  PFNGLFRAMEBUFFERTEXTURE1DEXTPROC glFramebufferTexture1DEXT;
   PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
-  PFNGLFRAMEBUFFERTEXTURE3DEXTPROC glFramebufferTexture3DEXT;
   PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT;
   PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC
   glGetFramebufferAttachmentParameterivEXT;
@@ -132,9 +167,6 @@ public:
   PFNGLBINDATTRIBLOCATIONARBPROC glBindAttribLocationARB;
   PFNGLGETACTIVEATTRIBARBPROC glGetActiveAttribARB;
   PFNGLGETATTRIBLOCATIONARBPROC glGetAttribLocationARB;
-  PFNGLDELETEOBJECTARBPROC glDeleteObjectARB;
-  PFNGLGETHANDLEARBPROC glGetHandleARB;
-  PFNGLDETACHOBJECTARBPROC glDetachObjectARB;
   PFNGLCREATESHADEROBJECTARBPROC glCreateShaderObjectARB;
   PFNGLSHADERSOURCEARBPROC glShaderSourceARB;
   PFNGLCOMPILESHADERARBPROC glCompileShaderARB;
@@ -143,34 +175,8 @@ public:
   PFNGLLINKPROGRAMARBPROC glLinkProgramARB;
   PFNGLUSEPROGRAMOBJECTARBPROC glUseProgramObjectARB;
   PFNGLVALIDATEPROGRAMARBPROC glValidateProgramARB;
-  PFNGLUNIFORM1FARBPROC glUniform1fARB;
-  PFNGLUNIFORM2FARBPROC glUniform2fARB;
-  PFNGLUNIFORM3FARBPROC glUniform3fARB;
-  PFNGLUNIFORM4FARBPROC glUniform4fARB;
-  PFNGLUNIFORM1IARBPROC glUniform1iARB;
-  PFNGLUNIFORM2IARBPROC glUniform2iARB;
-  PFNGLUNIFORM3IARBPROC glUniform3iARB;
-  PFNGLUNIFORM4IARBPROC glUniform4iARB;
-  PFNGLUNIFORM1FVARBPROC glUniform1fvARB;
-  PFNGLUNIFORM2FVARBPROC glUniform2fvARB;
-  PFNGLUNIFORM3FVARBPROC glUniform3fvARB;
-  PFNGLUNIFORM4FVARBPROC glUniform4fvARB;
-  PFNGLUNIFORM1IVARBPROC glUniform1ivARB;
-  PFNGLUNIFORM2IVARBPROC glUniform2ivARB;
-  PFNGLUNIFORM3IVARBPROC glUniform3ivARB;
-  PFNGLUNIFORM4IVARBPROC glUniform4ivARB;
-  PFNGLUNIFORMMATRIX2FVARBPROC glUniformMatrix2fvARB;
-  PFNGLUNIFORMMATRIX3FVARBPROC glUniformMatrix3fvARB;
-  PFNGLUNIFORMMATRIX4FVARBPROC glUniformMatrix4fvARB;
-  PFNGLGETOBJECTPARAMETERFVARBPROC glGetObjectParameterfvARB;
   PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
   PFNGLGETINFOLOGARBPROC glGetInfoLogARB;
-  PFNGLGETATTACHEDOBJECTSARBPROC glGetAttachedObjectsARB;
-  PFNGLGETUNIFORMLOCATIONARBPROC glGetUniformLocationARB;
-  PFNGLGETACTIVEUNIFORMARBPROC glGetActiveUniformARB;
-  PFNGLGETUNIFORMFVARBPROC glGetUniformfvARB;
-  PFNGLGETUNIFORMIVARBPROC glGetUniformivARB;
-  PFNGLGETSHADERSOURCEARBPROC glGetShaderSourceARB;
 };
 
 #endif

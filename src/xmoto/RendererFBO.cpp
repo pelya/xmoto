@@ -71,6 +71,7 @@ void SFXOverlay::init(DrawLib *i_drawLib,
     /* Shaders? */
     m_bUseShaders = m_drawLib->useShaders();
 
+#if !defined(__ANDROID__)
     if (m_bUseShaders) {
       m_VertShaderID = ((DrawLibOpenGL *)m_drawLib)
                          ->glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
@@ -120,6 +121,7 @@ void SFXOverlay::init(DrawLib *i_drawLib,
         }
       }
     }
+#endif //!defined(__ANDROID__)
   }
 #endif
 }
@@ -206,6 +208,7 @@ char **SFXOverlay::_LoadShaderSource(const std::string &File,
 
 bool SFXOverlay::_SetShaderSource(GLhandleARB ShaderID,
                                   const std::string &File) {
+#if !defined(__ANDROID__)
   /* Try loading file */
   unsigned int nNumLines;
   char **ppc = _LoadShaderSource(File, &nNumLines);
@@ -245,6 +248,9 @@ bool SFXOverlay::_SetShaderSource(GLhandleARB ShaderID,
   /* Free source */
   _FreeShaderSource(ppc, nNumLines);
   return true;
+#else
+  return false;
+#endif // !defined(__ANDROID__)
 }
 
 void SFXOverlay::_FreeShaderSource(char **ppc, unsigned int nNumLines) {
