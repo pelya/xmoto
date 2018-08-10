@@ -420,15 +420,9 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     glCheckFramebufferStatusEXT =
       (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)SDL_GL_GetProcAddress(
         "glCheckFramebufferStatusEXT");
-    glFramebufferTexture1DEXT =
-      (PFNGLFRAMEBUFFERTEXTURE1DEXTPROC)SDL_GL_GetProcAddress(
-        "glFramebufferTexture1DEXT");
     glFramebufferTexture2DEXT =
       (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)SDL_GL_GetProcAddress(
         "glFramebufferTexture2DEXT");
-    glFramebufferTexture3DEXT =
-      (PFNGLFRAMEBUFFERTEXTURE3DEXTPROC)SDL_GL_GetProcAddress(
-        "glFramebufferTexture3DEXT");
     glFramebufferRenderbufferEXT =
       (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress(
         "glFramebufferRenderbufferEXT");

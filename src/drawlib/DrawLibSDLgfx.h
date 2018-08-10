@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __DRAWLIBSDLGFX_H__
 #define __DRAWLIBSDLGFX_H__
 
+#include <vector>
+#include <map>
 #include "DrawLib.h"
 class PolyDraw;
 
