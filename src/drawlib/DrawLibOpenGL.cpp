@@ -208,15 +208,21 @@ DrawLibOpenGL::DrawLibOpenGL()
   Transform an OpenGL vertex to pure 2D
   ===========================================================================*/
 void DrawLibOpenGL::glVertexSP(float x, float y) {
-  glVertex2f(x, m_renderSurf->getDispHeight() - y);
+  //glVertex2f(x, m_renderSurf->getDispHeight() - y);
+  drawVertices.push_back(x);
+  drawVertices.push_back(m_renderSurf->getDispHeight() - y);
 }
 
 void DrawLibOpenGL::glVertex(float x, float y) {
-  glVertex2f(x, y);
+  //glVertex2f(x, y);
+  drawVertices.push_back(x);
+  drawVertices.push_back(y);
 }
 
 void DrawLibOpenGL::glTexCoord(float x, float y) {
-  glTexCoord2f(x, y);
+  //glTexCoord2f(x, y);
+  drawTexCoord.push_back(x);
+  drawTexCoord.push_back(y);
 }
 
 void DrawLibOpenGL::setClipRect(int x, int y, unsigned int w, unsigned int h) {
@@ -368,11 +374,15 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
       m_bVBOSupported = isExtensionSupported("GL_ARB_vertex_buffer_object");
     }
 
-    m_bFBOSupported = isExtensionSupported("GL_EXT_framebuffer_object");
+    m_bFBOSupported = isExtensionSupported("GL_EXT_framebuffer_object") || isExtensionSupported("GL_OES_framebuffer_object");
 
     m_bShadersSupported = isExtensionSupported("GL_ARB_fragment_shader") &&
                           isExtensionSupported("GL_ARB_vertex_shader") &&
                           isExtensionSupported("GL_ARB_shader_objects");
+#ifdef __ANDROID__
+    m_bShadersSupported = false;
+    m_bVBOSupported = true;
+#endif
   }
 
   if (m_bVBOSupported == true) {
@@ -385,6 +395,13 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     glDeleteBuffersARB =
       (PFNGLDELETEBUFFERSARBPROC)SDL_GL_GetProcAddress("glDeleteBuffersARB");
 
+#ifdef __ANDROID__
+    glGenBuffersARB = &::glGenBuffers;
+    glBindBufferARB = &::glBindBuffer;
+    glBufferDataARB = &::glBufferData;
+    glDeleteBuffersARB = &::glDeleteBuffers;
+#endif
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -393,23 +410,6 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     LogInfo("GL: not using ARB_vertex_buffer_object");
 
   if (m_bFBOSupported == true) {
-    glIsRenderbufferEXT =
-      (PFNGLISRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress("glIsRenderbufferEXT");
-    glBindRenderbufferEXT = (PFNGLBINDRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress(
-      "glBindRenderbufferEXT");
-    glDeleteRenderbuffersEXT =
-      (PFNGLDELETERENDERBUFFERSEXTPROC)SDL_GL_GetProcAddress(
-        "glDeleteRenderbuffersEXT");
-    glGenRenderbuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC)SDL_GL_GetProcAddress(
-      "glGenRenderbuffersEXT");
-    glRenderbufferStorageEXT =
-      (PFNGLRENDERBUFFERSTORAGEEXTPROC)SDL_GL_GetProcAddress(
-        "glRenderbufferStorageEXT");
-    glGetRenderbufferParameterivEXT =
-      (PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC)SDL_GL_GetProcAddress(
-        "glGetRenderbufferParameterivEXT");
-    glIsFramebufferEXT =
-      (PFNGLISFRAMEBUFFEREXTPROC)SDL_GL_GetProcAddress("glIsFramebufferEXT");
     glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)SDL_GL_GetProcAddress(
       "glBindFramebufferEXT");
     glDeleteFramebuffersEXT =
@@ -417,20 +417,16 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
         "glDeleteFramebuffersEXT");
     glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)SDL_GL_GetProcAddress(
       "glGenFramebuffersEXT");
-    glCheckFramebufferStatusEXT =
-      (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)SDL_GL_GetProcAddress(
-        "glCheckFramebufferStatusEXT");
     glFramebufferTexture2DEXT =
       (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)SDL_GL_GetProcAddress(
         "glFramebufferTexture2DEXT");
-    glFramebufferRenderbufferEXT =
-      (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress(
-        "glFramebufferRenderbufferEXT");
-    glGetFramebufferAttachmentParameterivEXT =
-      (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC)SDL_GL_GetProcAddress(
-        "glGetFramebufferAttachmentParameterivEXT");
-    glGenerateMipmapEXT =
-      (PFNGLGENERATEMIPMAPEXTPROC)SDL_GL_GetProcAddress("glGenerateMipmapEXT");
+
+#ifdef __ANDROID__
+    glBindFramebufferEXT = &::glBindFramebufferOES;
+    glDeleteFramebuffersEXT = &::glDeleteFramebuffersOES;
+    glGenFramebuffersEXT = &::glGenFramebuffersOES;
+    glFramebufferTexture2DEXT = &::glFramebufferTexture2DOES;
+#endif
 
     LogInfo("GL: using EXT_framebuffer_object");
   } else
@@ -528,7 +524,9 @@ Img *DrawLibOpenGL::grabScreen(int i_reduce) {
   unsigned char *pcTemp = new unsigned char[m_nDispWidth * 3];
 
   /* Select frontbuffer */
+#ifndef __ANDROID__
   glReadBuffer(GL_FRONT);
+#endif
 
   for (unsigned int i = 0; i < v_imgH; i++) {
     glReadPixels(
@@ -547,30 +545,42 @@ Img *DrawLibOpenGL::grabScreen(int i_reduce) {
 }
 
 void DrawLibOpenGL::startDraw(DrawMode mode) {
-  switch (mode) {
-    case DRAW_MODE_POLYGON:
-      glBegin(GL_POLYGON);
-      break;
-    case DRAW_MODE_LINE_LOOP:
-      glBegin(GL_LINE_LOOP);
-      break;
-    case DRAW_MODE_LINE_STRIP:
-      glBegin(GL_LINE_STRIP);
-      break;
-    default:
-      break;
-  };
+  drawMode = mode;
+  drawVertices.clear();
+  drawTexCoord.clear();
 }
 
 void DrawLibOpenGL::endDraw() {
-  glEnd();
+  endDrawKeepProperties();
   if (m_blendMode != BLEND_MODE_NONE) {
     glDisable(GL_BLEND);
   }
 }
 
 void DrawLibOpenGL::endDrawKeepProperties() {
-  glEnd();
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, drawVertices.data());
+  if (drawTexCoord.size() >= drawVertices.size()) {
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, 0, drawTexCoord.data());
+  }
+  switch (drawMode) {
+    case DRAW_MODE_POLYGON:
+      glDrawArrays(GL_TRIANGLE_FAN, 0, drawVertices.size() / 2);
+      break;
+    case DRAW_MODE_LINE_LOOP:
+      glDrawArrays(GL_LINE_LOOP, 0, drawVertices.size() / 2);
+      break;
+    case DRAW_MODE_LINE_STRIP:
+      glDrawArrays(GL_LINE_STRIP, 0, drawVertices.size() / 2);
+      break;
+    default:
+      break;
+  };
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  drawVertices.clear();
+  drawTexCoord.clear();
 }
 
 void DrawLibOpenGL::removePropertiesAfterEnd() {

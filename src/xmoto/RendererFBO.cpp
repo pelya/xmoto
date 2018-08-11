@@ -284,10 +284,10 @@ void SFXOverlay::fade(float f, unsigned int i_frameNumber) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     m_drawLib->startDraw(DRAW_MODE_POLYGON);
     m_drawLib->setColorRGBA(0, 0, 0, (int)(f * 255));
-    glVertex2f(0, 0);
-    glVertex2f(1, 0);
-    glVertex2f(1, 1);
-    glVertex2f(0, 1);
+    m_drawLib->glVertex(0, 0);
+    m_drawLib->glVertex(1, 0);
+    m_drawLib->glVertex(1, 1);
+    m_drawLib->glVertex(0, 1);
     m_drawLib->endDraw();
     glDisable(GL_BLEND);
 

@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __DRAWLIBOPENGL_H__
 #define __DRAWLIBOPENGL_H__
 
+#include <vector>
 #include "DrawLib.h"
 #include "include/xm_OpenGL.h"
 
@@ -30,24 +31,13 @@ typedef void GL_APIENTRY (*PFNGLGENBUFFERSARBPROC) (GLsizei n, GLuint *buffers);
 typedef void GL_APIENTRY (*PFNGLBINDBUFFERARBPROC) (GLenum target, GLuint buffer);
 typedef void GL_APIENTRY (*PFNGLBUFFERDATAARBPROC) (GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
 typedef void GL_APIENTRY (*PFNGLDELETEBUFFERSARBPROC) (GLsizei n, const GLuint *buffers);
-typedef GLboolean GL_APIENTRY (*PFNGLISRENDERBUFFEREXTPROC) (GLuint renderbuffer);
-typedef void GL_APIENTRY (*PFNGLBINDRENDERBUFFEREXTPROC) (GLenum target, GLuint renderbuffer);
-typedef void GL_APIENTRY (*PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuint *renderbuffers);
-typedef void GL_APIENTRY (*PFNGLGENRENDERBUFFERSEXTPROC) (GLsizei n, GLuint *renderbuffers);
-typedef void GL_APIENTRY (*PFNGLRENDERBUFFERSTORAGEEXTPROC) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
-typedef void GL_APIENTRY (*PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC) (GLenum target, GLenum pname, GLint *params);
-typedef GLboolean GL_APIENTRY (*PFNGLISFRAMEBUFFEREXTPROC) (GLuint framebuffer);
 typedef void GL_APIENTRY (*PFNGLBINDFRAMEBUFFEREXTPROC) (GLenum target, GLuint framebuffer);
 typedef void GL_APIENTRY (*PFNGLDELETEFRAMEBUFFERSEXTPROC) (GLsizei n, const GLuint *framebuffers);
 typedef void GL_APIENTRY (*PFNGLGENFRAMEBUFFERSEXTPROC) (GLsizei n, GLuint *framebuffers);
-typedef GLenum GL_APIENTRY (*PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) (GLenum target);
 typedef void GL_APIENTRY (*PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-typedef void GL_APIENTRY (*PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC) (GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
-typedef void GL_APIENTRY (*PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC) (GLenum target, GLenum attachment, GLenum pname, GLint *params);
 typedef void GL_APIENTRY (*PFNGLBINDATTRIBLOCATIONARBPROC) (GLhandleARB programObj, GLuint index, const GLcharARB *name);
 typedef void GL_APIENTRY (*PFNGLGETACTIVEATTRIBARBPROC) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei *length, GLint *size, GLenum *type, GLcharARB *name);
 typedef GLint GL_APIENTRY (*PFNGLGETATTRIBLOCATIONARBPROC) (GLhandleARB programObj, const GLcharARB *name);
-typedef void GL_APIENTRY (*PFNGLGENERATEMIPMAPEXTPROC) (GLenum target);
 typedef void GL_APIENTRY (*PFNGLSHADERSOURCEARBPROC) (GLhandleARB shaderObj, GLsizei count, const GLcharARB* *string, const GLint *length);
 typedef void GL_APIENTRY (*PFNGLCOMPILESHADERARBPROC) (GLhandleARB shaderObj);
 typedef GLhandleARB GL_APIENTRY (*PFNGLCREATEPROGRAMOBJECTARBPROC) (void);
@@ -58,7 +48,6 @@ typedef void GL_APIENTRY (*PFNGLUSEPROGRAMOBJECTARBPROC) (GLhandleARB programObj
 typedef void GL_APIENTRY (*PFNGLVALIDATEPROGRAMARBPROC) (GLhandleARB programObj);
 typedef void GL_APIENTRY (*PFNGLGETOBJECTPARAMETERIVARBPROC) (GLhandleARB obj, GLenum pname, GLint *params);
 typedef void GL_APIENTRY (*PFNGLGETINFOLOGARBPROC) (GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog);
-
 #endif
 
 class DrawLibOpenGL : public DrawLib {
@@ -139,6 +128,10 @@ public:
   virtual Img *grabScreen(int i_reduce = 1);
   virtual bool isExtensionSupported(std::string Ext);
 
+  DrawMode drawMode;
+  std::vector<GLfloat> drawVertices;
+  std::vector<GLfloat> drawTexCoord;
+
   /* Extensions */
   PFNGLGENBUFFERSARBPROC glGenBuffersARB;
   PFNGLBINDBUFFERARBPROC glBindBufferARB;
@@ -146,22 +139,10 @@ public:
   PFNGLDELETEBUFFERSARBPROC glDeleteBuffersARB;
 
   /* Extensions (for render-to-texture) */
-  PFNGLISRENDERBUFFEREXTPROC glIsRenderbufferEXT;
-  PFNGLBINDRENDERBUFFEREXTPROC glBindRenderbufferEXT;
-  PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT;
-  PFNGLGENRENDERBUFFERSEXTPROC glGenRenderbuffersEXT;
-  PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorageEXT;
-  PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC glGetRenderbufferParameterivEXT;
-  PFNGLISFRAMEBUFFEREXTPROC glIsFramebufferEXT;
   PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
   PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
   PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
-  PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
   PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
-  PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT;
-  PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC
-  glGetFramebufferAttachmentParameterivEXT;
-  PFNGLGENERATEMIPMAPEXTPROC glGenerateMipmapEXT;
 
   /* Extensions (for shaders) */
   PFNGLBINDATTRIBLOCATIONARBPROC glBindAttribLocationARB;
