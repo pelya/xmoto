@@ -198,7 +198,7 @@ void Packager::go(const std::string &BinFile, const std::string &DataDir) {
   fclose(fp);
 
   /* Info */
-  printf("%lu files scheduled for packaging!\n", FileList.size());
+  printf("%lu files scheduled for packaging!\n", (long)FileList.size());
   printf("Creating package '%s'...\n", BinFile.c_str());
 
   /* Do it */
