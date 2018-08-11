@@ -82,8 +82,8 @@ static void xdgZeroMemory(void* p, size_t n)
 #endif
 
 // Xmoto
-#include "../include/basedir.h"
-#include "../include/basedir_fs.h"
+#include "../include/xdgbasedir/basedir.h"
+#include "../include/xdgbasedir/basedir_fs.h"
 
 #ifndef MAX
 #define MAX(a, b) ((b) > (a) ? (b) : (a))
