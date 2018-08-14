@@ -1123,10 +1123,10 @@ void GLFontManager::printStringGradOne(DrawLib *pDrawLib,
   int oldTextureId = -1;
   int newTextureId;
 
-  char r1, r2, r3, r4;
-  char g1, g2, g3, g4;
-  char b1, b2, b3, b4;
-  char a1, a2, a3, a4;
+  GLubyte r1, r2, r3, r4;
+  GLubyte g1, g2, g3, g4;
+  GLubyte b1, b2, b3, b4;
+  GLubyte a1, a2, a3, a4;
 
   r1 = GET_RED(c1);
   r2 = GET_RED(c2);
@@ -1159,8 +1159,12 @@ void GLFontManager::printStringGradOne(DrawLib *pDrawLib,
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // the first glBegin/glEnd will draw nothing
-    glBegin(GL_QUADS);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> texCoord;
+    std::vector<GLubyte> colors;
 
     v_longuest_linesize = getLonguestLineSize(v_value);
     v_size = v_value.size();
@@ -1193,35 +1197,71 @@ void GLFontManager::printStringGradOne(DrawLib *pDrawLib,
 
           newTextureId = v_glyphLetter->GLID();
           if (newTextureId != oldTextureId) {
-            glEnd();
+            glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+            glTexCoordPointer(2, GL_FLOAT, 0, texCoord.data());
+            glColorPointer(4, GL_UNSIGNED_BYTE, 0, colors.data());
+            if (vertices.size() >= 6) {
+                glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 2);
+            }
             glBindTexture(GL_TEXTURE_2D, newTextureId);
-            glBegin(GL_QUADS);
             oldTextureId = newTextureId;
           }
 
-          glColor4ub(r1, g1, b1, a1);
-          glTexCoord2f(v_glyphLetter->m_u.x, v_glyphLetter->m_v.y);
-          glVertex2i(v_x, v_y);
+          GLubyte c1[4] = {r1, g1, b1, a1};
+          colors.insert(colors.end(), c1, c1 + 4);
+          texCoord.push_back(v_glyphLetter->m_u.x);
+          texCoord.push_back(v_glyphLetter->m_v.y);
+          vertices.push_back(v_x);
+          vertices.push_back(v_y);
 
-          glColor4ub(r2, g2, b2, a2);
-          glTexCoord2f(v_glyphLetter->m_v.x, v_glyphLetter->m_v.y);
-          glVertex2i(v_x + v_glyphLetter->drawWidth(), v_y);
+          GLubyte c2[4] = {r2, g2, b2, a2};
+          colors.insert(colors.end(), c2, c2 + 4);
+          texCoord.push_back(v_glyphLetter->m_v.x);
+          texCoord.push_back(v_glyphLetter->m_v.y);
+          vertices.push_back(v_x + v_glyphLetter->drawWidth());
+          vertices.push_back(v_y);
 
-          glColor4ub(r4, g4, b4, a4);
-          glTexCoord2f(v_glyphLetter->m_v.x, v_glyphLetter->m_u.y);
-          glVertex2i(v_x + v_glyphLetter->drawWidth(),
-                     v_y + v_glyphLetter->drawHeight());
+          GLubyte c4[4] = {r4, g4, b4, a4};
+          colors.insert(colors.end(), c4, c4 + 4);
+          texCoord.push_back(v_glyphLetter->m_v.x);
+          texCoord.push_back(v_glyphLetter->m_u.y);
+          vertices.push_back(v_x + v_glyphLetter->drawWidth());
+          vertices.push_back(v_y + v_glyphLetter->drawHeight());
 
-          glColor4ub(r3, g3, b3, a3);
-          glTexCoord2f(v_glyphLetter->m_u.x, v_glyphLetter->m_u.y);
-          glVertex2i(v_x, v_y + v_glyphLetter->drawHeight());
+          colors.insert(colors.end(), c1, c1 + 4);
+          texCoord.push_back(v_glyphLetter->m_u.x);
+          texCoord.push_back(v_glyphLetter->m_v.y);
+          vertices.push_back(v_x);
+          vertices.push_back(v_y);
+
+          colors.insert(colors.end(), c4, c4 + 4);
+          texCoord.push_back(v_glyphLetter->m_v.x);
+          texCoord.push_back(v_glyphLetter->m_u.y);
+          vertices.push_back(v_x + v_glyphLetter->drawWidth());
+          vertices.push_back(v_y + v_glyphLetter->drawHeight());
+
+          GLubyte c3[4] = {r3, g3, b3, a3};
+          colors.insert(colors.end(), c3, c3 + 4);
+          texCoord.push_back(v_glyphLetter->m_u.x);
+          texCoord.push_back(v_glyphLetter->m_u.y);
+          vertices.push_back(v_x);
+          vertices.push_back(v_y + v_glyphLetter->drawHeight());
 
           v_x += v_glyphLetter->realWidth() + UTF8_INTERCHAR_SPACE;
         }
       }
     }
 
-    glEnd();
+    glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+    glTexCoordPointer(2, GL_FLOAT, 0, texCoord.data());
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, colors.data());
+    if (vertices.size() >= 6) {
+      glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 2);
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
 
