@@ -661,6 +661,35 @@ std::vector<Geom *> LevelGeoms::loadBlockEdgeGeom(Block *pBlock,
                    v_upperBlockGeomsIndex.end());
   v_geoms = v_tempVec;
 
+  // Convert from quads to triangles
+  for (unsigned int i = 0; i < v_geoms.size(); i++) {
+    for (unsigned int j = 0; j < v_geoms[i]->Polys.size(); j++) {
+      GeomPoly *pPoly = v_geoms[i]->Polys[j];
+      unsigned int numrects = pPoly->nNumVertices / 4;
+      GeomCoord *vertices = new GeomCoord[numrects * 6];
+      GeomCoord *texCoords = new GeomCoord[numrects * 6];
+      for (unsigned int k = 0; k < numrects; k++) {
+        vertices [k * 6    ] = pPoly->pVertices [k * 4    ];
+        texCoords[k * 6    ] = pPoly->pTexCoords[k * 4    ];
+        vertices [k * 6 + 1] = pPoly->pVertices [k * 4 + 1];
+        texCoords[k * 6 + 1] = pPoly->pTexCoords[k * 4 + 1];
+        vertices [k * 6 + 2] = pPoly->pVertices [k * 4 + 2];
+        texCoords[k * 6 + 2] = pPoly->pTexCoords[k * 4 + 2];
+        vertices [k * 6 + 3] = pPoly->pVertices [k * 4    ];
+        texCoords[k * 6 + 3] = pPoly->pTexCoords[k * 4    ];
+        vertices [k * 6 + 4] = pPoly->pVertices [k * 4 + 2];
+        texCoords[k * 6 + 4] = pPoly->pTexCoords[k * 4 + 2];
+        vertices [k * 6 + 5] = pPoly->pVertices [k * 4 + 3];
+        texCoords[k * 6 + 5] = pPoly->pTexCoords[k * 4 + 3];
+      }
+      delete [] pPoly->pVertices;
+      delete [] pPoly->pTexCoords;
+      pPoly->pVertices = vertices;
+      pPoly->pTexCoords = texCoords;
+      pPoly->nNumVertices = numrects * 6;
+    }
+  }
+
 #ifdef ENABLE_OPENGL
   /* Use VBO optimization? */
   if (GameApp::instance()->getDrawLib()->useVBOs()) {

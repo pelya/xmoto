@@ -2358,7 +2358,7 @@ void GameRenderer::_RenderBlockEdges(Block *pBlock) {
             ->glBindBufferARB(GL_ARRAY_BUFFER_ARB, pPoly->nTexCoordBufferID);
           glTexCoordPointer(2, GL_FLOAT, 0, (char *)NULL);
 
-          glDrawArrays(GL_QUADS, 0, pPoly->nNumVertices);
+          glDrawArrays(GL_TRIANGLES, 0, pPoly->nNumVertices);
         }
       } else {
         for (unsigned int j = 0; j < pBlock->getEdgeGeoms()[i]->Polys.size();
@@ -2366,7 +2366,7 @@ void GameRenderer::_RenderBlockEdges(Block *pBlock) {
           GeomPoly *pPoly = pBlock->getEdgeGeoms()[i]->Polys[j];
           glVertexPointer(2, GL_FLOAT, 0, pPoly->pVertices);
           glTexCoordPointer(2, GL_FLOAT, 0, pPoly->pTexCoords);
-          glDrawArrays(GL_QUADS, 0, pPoly->nNumVertices);
+          glDrawArrays(GL_TRIANGLES, 0, pPoly->nNumVertices);
         }
       }
     }
