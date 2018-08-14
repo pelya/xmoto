@@ -2091,14 +2091,14 @@ void GameRenderer::_RenderDynamicBlocks(Scene *i_scene, bool bBackground) {
               ->glBindBufferARB(GL_ARRAY_BUFFER_ARB, pPoly->nTexCoordBufferID);
             glTexCoordPointer(2, GL_FLOAT, 0, (char *)NULL);
 
-            glDrawArrays(GL_POLYGON, 0, pPoly->nNumVertices);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, pPoly->nNumVertices);
           }
         } else {
           for (unsigned int j = 0; j < geom->Polys.size(); j++) {
             GeomPoly *pPoly = geom->Polys[j];
             glVertexPointer(2, GL_FLOAT, 0, pPoly->pVertices);
             glTexCoordPointer(2, GL_FLOAT, 0, pPoly->pTexCoords);
-            glDrawArrays(GL_POLYGON, 0, pPoly->nNumVertices);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, pPoly->nNumVertices);
           }
         }
 
@@ -2266,14 +2266,14 @@ void GameRenderer::_RenderStaticBlock(Block *block) {
           ->glBindBufferARB(GL_ARRAY_BUFFER_ARB, pPoly->nTexCoordBufferID);
         glTexCoordPointer(2, GL_FLOAT, 0, (char *)NULL);
 
-        glDrawArrays(GL_POLYGON, 0, pPoly->nNumVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, pPoly->nNumVertices);
       }
     } else {
       for (unsigned int j = 0; j < geom->Polys.size(); j++) {
         GeomPoly *pPoly = geom->Polys[j];
         glVertexPointer(2, GL_FLOAT, 0, pPoly->pVertices);
         glTexCoordPointer(2, GL_FLOAT, 0, pPoly->pTexCoords);
-        glDrawArrays(GL_POLYGON, 0, pPoly->nNumVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, pPoly->nNumVertices);
       }
     }
 
