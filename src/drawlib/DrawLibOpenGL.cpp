@@ -208,21 +208,15 @@ DrawLibOpenGL::DrawLibOpenGL()
   Transform an OpenGL vertex to pure 2D
   ===========================================================================*/
 void DrawLibOpenGL::glVertexSP(float x, float y) {
-  //glVertex2f(x, m_renderSurf->getDispHeight() - y);
-  drawVertices.push_back(x);
-  drawVertices.push_back(m_renderSurf->getDispHeight() - y);
+  glVertex2f(x, m_renderSurf->getDispHeight() - y);
 }
 
 void DrawLibOpenGL::glVertex(float x, float y) {
-  //glVertex2f(x, y);
-  drawVertices.push_back(x);
-  drawVertices.push_back(y);
+  glVertex2f(x, y);
 }
 
 void DrawLibOpenGL::glTexCoord(float x, float y) {
-  //glTexCoord2f(x, y);
-  drawTexCoord.push_back(x);
-  drawTexCoord.push_back(y);
+  glTexCoord2f(x, y);
 }
 
 void DrawLibOpenGL::setClipRect(int x, int y, unsigned int w, unsigned int h) {
@@ -545,9 +539,19 @@ Img *DrawLibOpenGL::grabScreen(int i_reduce) {
 }
 
 void DrawLibOpenGL::startDraw(DrawMode mode) {
-  drawMode = mode;
-  drawVertices.clear();
-  drawTexCoord.clear();
+  switch (mode) {
+    case DRAW_MODE_POLYGON:
+      glBegin(GL_TRIANGLE_FAN);
+      break;
+    case DRAW_MODE_LINE_LOOP:
+      glBegin(GL_LINE_LOOP);
+      break;
+    case DRAW_MODE_LINE_STRIP:
+      glBegin(GL_LINE_STRIP);
+      break;
+    default:
+      break;
+  };
 }
 
 void DrawLibOpenGL::endDraw() {
@@ -558,29 +562,7 @@ void DrawLibOpenGL::endDraw() {
 }
 
 void DrawLibOpenGL::endDrawKeepProperties() {
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, drawVertices.data());
-  if (drawTexCoord.size() >= drawVertices.size()) {
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, 0, drawTexCoord.data());
-  }
-  switch (drawMode) {
-    case DRAW_MODE_POLYGON:
-      glDrawArrays(GL_TRIANGLE_FAN, 0, drawVertices.size() / 2);
-      break;
-    case DRAW_MODE_LINE_LOOP:
-      glDrawArrays(GL_LINE_LOOP, 0, drawVertices.size() / 2);
-      break;
-    case DRAW_MODE_LINE_STRIP:
-      glDrawArrays(GL_LINE_STRIP, 0, drawVertices.size() / 2);
-      break;
-    default:
-      break;
-  };
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  drawVertices.clear();
-  drawTexCoord.clear();
+  glEnd();
 }
 
 void DrawLibOpenGL::removePropertiesAfterEnd() {
