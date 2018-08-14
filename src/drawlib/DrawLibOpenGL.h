@@ -131,6 +131,7 @@ public:
   DrawMode drawMode;
   std::vector<GLfloat> drawVertices;
   std::vector<GLfloat> drawTexCoord;
+  std::vector<GLfloat> drawColors;
 
   /* Extensions */
   PFNGLGENBUFFERSARBPROC glGenBuffersARB;

@@ -548,6 +548,7 @@ void DrawLibOpenGL::startDraw(DrawMode mode) {
   drawMode = mode;
   drawVertices.clear();
   drawTexCoord.clear();
+  drawColors.clear();
 }
 
 void DrawLibOpenGL::endDraw() {
@@ -564,6 +565,10 @@ void DrawLibOpenGL::endDrawKeepProperties() {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(2, GL_FLOAT, 0, drawTexCoord.data());
   }
+  if (drawColors.size() >= drawVertices.size() * 2) {
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, drawColors.data());
+  }
   switch (drawMode) {
     case DRAW_MODE_POLYGON:
       glDrawArrays(GL_TRIANGLE_FAN, 0, drawVertices.size() / 2);
@@ -579,8 +584,11 @@ void DrawLibOpenGL::endDrawKeepProperties() {
   };
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
   drawVertices.clear();
   drawTexCoord.clear();
+  drawColors.clear();
+  drawMode = DRAW_MODE_NONE;
 }
 
 void DrawLibOpenGL::removePropertiesAfterEnd() {
@@ -594,8 +602,12 @@ void DrawLibOpenGL::removePropertiesAfterEnd() {
 }
 
 void DrawLibOpenGL::setColor(Color color) {
-  glColor4ub(
-    GET_RED(color), GET_GREEN(color), GET_BLUE(color), GET_ALPHA(color));
+  if (drawMode == DRAW_MODE_NONE) {
+    glColor4ub(GET_RED(color), GET_GREEN(color), GET_BLUE(color), GET_ALPHA(color));
+  } else {
+    GLubyte c[4] = { (GLubyte) GET_RED(color), (GLubyte) GET_GREEN(color), (GLubyte) GET_BLUE(color), (GLubyte) GET_ALPHA(color)};
+    drawColors.insert(drawColors.end(), c, c + 4);
+  }
 }
 
 void DrawLibOpenGL::setTexture(Texture *texture, BlendMode blendMode) {
