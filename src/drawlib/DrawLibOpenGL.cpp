@@ -383,6 +383,8 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     m_bShadersSupported = false;
     m_bVBOSupported = true;
 #endif
+    //m_bShadersSupported = false;
+    //m_bVBOSupported = false;
   }
 
   if (m_bVBOSupported == true) {
@@ -564,10 +566,14 @@ void DrawLibOpenGL::endDrawKeepProperties() {
   if (drawTexCoord.size() >= drawVertices.size()) {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(2, GL_FLOAT, 0, drawTexCoord.data());
+  } else if (drawTexCoord.size() > 0) {
+    LogError("%s: drawTexCoord.size() not zero and less than drawVertices.size()\n", __FUNCTION__);
   }
   if (drawColors.size() >= drawVertices.size() * 2) {
     glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(4, GL_UNSIGNED_BYTE, 0, drawColors.data());
+  } else if (drawColors.size() > 0) {
+    LogError("%s: drawColors.size() not zero and less than drawVertices.size() * 2\n", __FUNCTION__);
   }
   switch (drawMode) {
     case DRAW_MODE_POLYGON:
