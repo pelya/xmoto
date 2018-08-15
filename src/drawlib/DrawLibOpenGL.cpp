@@ -301,6 +301,12 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
   if (m_bWindowed == false)
     nFlags |= SDL_FULLSCREEN;
 
+#ifdef __ANDROID__
+  // Always fullscreen on Android
+  m_nDispWidth = pVidInfo->current_w;
+  m_nDispHeight = pVidInfo->current_h;
+#endif
+
   /* At last, try to "set the video mode" */
   if ((m_screen = SDL_SetVideoMode(
          m_nDispWidth, m_nDispHeight, m_nDispBPP, nFlags)) == NULL) {
