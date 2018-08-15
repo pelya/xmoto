@@ -13,6 +13,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <GLES/gl.h>
 #include <GLES/glext.h>
+#include <GL/glu.h> /* Not in NDK */
 #else
 #include <GL/gl.h> /* Header File For The OpenGL Library */
 #include <GL/glu.h> /* Header File For The GLU Library */
