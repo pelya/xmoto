@@ -25,6 +25,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <cstdio>
 #include <stdarg.h>
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
+
 bool Logger::m_isInitialized = false;
 bool Logger::m_activ = true;
 bool Logger::m_verbose = false;
@@ -71,6 +76,9 @@ void Logger::setActiv(bool i_value) {
 }
 
 void Logger::LogRaw(const std::string &s) {
+#ifdef __ANDROID__
+  __android_log_print(ANDROID_LOG_INFO, "XMoto", "%s", s.c_str());
+#endif
   if (m_activ == false) {
     return;
   }
