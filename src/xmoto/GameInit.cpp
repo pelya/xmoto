@@ -70,6 +70,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <signal.h>
 #endif
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #define MOUSE_DBCLICK_TIME 0.250f
 
 #define XM_MAX_NB_LOOPS_WITH_NONETWORK 3
@@ -112,7 +116,8 @@ int main(int nNumArgs, char **ppcArgs) {
 #endif
 
 #ifdef __ANDROID__
-  setenv("XDG_DATA_DIRS", ".", 1); // Android does not have /usr/share, data files are in the local directory
+  __android_log_print(ANDROID_LOG_INFO, "XMoto", "Setting XDG_DATA_DIRS to %s/", getenv("DATADIR"));
+  setenv("XDG_DATA_DIRS", (std::string(getenv("DATADIR")) + "/").c_str(), 1); // Android does not have /usr/share/, data files are in the local directory
 #endif
 
   /* Start application */
@@ -121,6 +126,9 @@ int main(int nNumArgs, char **ppcArgs) {
     GameApp::instance()->run(nNumArgs, ppcArgs);
     GameApp::destroy();
   } catch (Exception &e) {
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_INFO, "XMoto", "Exception: %s", e.getMsg().c_str());
+#endif
     if (Logger::isInitialized()) {
       LogError((std::string("Exception: ") + e.getMsg()).c_str());
     }

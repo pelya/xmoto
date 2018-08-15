@@ -36,6 +36,7 @@ bool Logger::m_verbose = false;
 FILE *Logger::m_fd = NULL;
 
 void Logger::init(const std::string &i_logFile) {
+#ifndef __ANDROID__
   std::string v_logPath = XMFS::getUserDir(FDT_CACHE) + "/" + i_logFile;
 
   assert(XMFS::isInitialized());
@@ -50,12 +51,14 @@ void Logger::init(const std::string &i_logFile) {
   if (m_fd == NULL) {
     throw Exception("Unable to open log file");
   }
-
+#endif /* Android */
   m_isInitialized = true;
 }
 
 void Logger::uninit() {
+#ifndef __ANDROID__
   fclose(m_fd);
+#endif /* Android */
   m_isInitialized = false;
 }
 
@@ -77,7 +80,8 @@ void Logger::setActiv(bool i_value) {
 
 void Logger::LogRaw(const std::string &s) {
 #ifdef __ANDROID__
-  __android_log_print(ANDROID_LOG_INFO, "XMoto", "%s", s.c_str());
+  __android_log_write(ANDROID_LOG_INFO, "XMoto", s.c_str());
+  return;
 #endif
   if (m_activ == false) {
     return;
@@ -115,6 +119,11 @@ void Logger::LogLevelMsg(LogLevel i_level, const char *pcFmt, ...) {
 }
 
 void Logger::LogData(void *data, unsigned int len) {
+#ifdef __ANDROID__
+  __android_log_print(ANDROID_LOG_INFO, "XMoto", "=== Packet [%u]: ===", len);
+  return;
+#endif
+
   if (m_activ == false) {
     return;
   }
